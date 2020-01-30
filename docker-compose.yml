@@ -12,12 +12,12 @@ services:
       - ./python:/externo
       - ./postgres:/scripts
 
-#  python-compose:
-#    image: python-mh
-#    ports:
-#      - "8888:8888"
-#    volumes:
-#      - ./python:/app/externo
+  python-compose:
+    image: python-mh
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./python:/app/externo
 
   pgadmin-compose:
     image: dpage/pgadmin4

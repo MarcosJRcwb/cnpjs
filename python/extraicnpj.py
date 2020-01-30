@@ -2,20 +2,21 @@
 
 import sys
 import io
+import psycopg2
+from FilaDeLinhas import FilaDeLinhas
 
 def trata(texto):
   ok = texto
   ok = ok.replace(';',' ')
   ok = ok.replace('"',' ')
   ok = ok.replace('\0','')
+  ok = ok.replace('\\','/')
   ok = ok.strip()
   while '  ' in ok:
     ok = ok.replace('  ',' ')
-  if ok.endswith('\\'):
-    ok = ok[:-1]
   return ok
 
-def processatipo1(ftrat,line):
+def processatipo1(regsd : FilaDeLinhas,line):
   cnpj = line[3:17]
   matriz = line[17]
   razsoc = trata(line[18:168])
@@ -39,10 +40,11 @@ def processatipo1(ftrat,line):
   simples = line[907:909]
   mei = line[924]
   linha = cnpj+';'+matriz+';'+razsoc.strip()+';'+fantasia.strip()+';'+situac+';'+dt_situac+';'+dt_ini+';'+cnae+';'+tipolog.strip()+';'+lograd.strip()+';'+numend.strip()+';'+comple.strip()+';'+bairro.strip()+';'+uf+';'+munic.strip()+';'+email.strip()+';'+capit+';'+porte+';'+simples+';'+mei+'\n'
-  ftrat.write(linha.encode('UTF-8','ignore'))
+  linha = linha.encode('UTF-8','ignore').decode('UTF-8')
+  regsd.AdicionaLinha(linha)
   return
   
-def processatipo2(ftrat,line,ultlinha2):
+def processatipo2(regss : FilaDeLinhas,line,ultlinha2):
   cnpj = line[3:17]
   socio = trata(line[18:168])
   cpfsoc = line[168:182]
@@ -50,15 +52,15 @@ def processatipo2(ftrat,line,ultlinha2):
   perc = line[184:189]
   dt_ent = line[189:197]
   cpfleg = line[270:281]
-  linhasoc = cnpj+';'+socio.strip()+';'+cpfsoc+';'+qualif+';'+perc+';'+dt_ent+';'+cpfleg
+  linhasoc = cnpj+';'+socio.strip()+';'+cpfsoc+';'+qualif+';'+perc+';'+dt_ent+';'+cpfleg+'\n'
   if linhasoc in ultlinha2:
     return ultlinha2
-  linhasoc=linhasoc+'\n'
-  ftrat.write(linhasoc.encode('UTF-8','ignore'))
+  linhasoc = linhasoc.encode('UTF-8','ignore').decode('UTF-8')
+  regss.AdicionaLinha(linhasoc)
   ultlinha2 = ultlinha2 + ' ' + linhasoc
   return ultlinha2
 
-def processatipo6(ftrat,line):
+def processatipo6(regsc : FilaDeLinhas,line):
   cnpj = line[3:17]
   cnae = line[17:710]
   cnae = cnae.strip()
@@ -71,27 +73,27 @@ def processatipo6(ftrat,line):
     ult = ult + ' ' + cnaex
     if cnaex == '0000000' or cnaex == '9999999':
       break
-    ftrat.write(cnpj+';'+cnaex+'\n')
+    regsc.AdicionaLinha(cnpj+';'+cnaex+'\n')
   return
 
-def tratar(ftratd,ftrats,ftratc,line,ultlinha2):
+def tratar(origd,origs,origc,line,ultlinha2):
   if line[0] == '0':
     # registro header, nenhuma informação útil
     return ultlinha2
 
   if line[0] == '1':
     # detalhes
-    processatipo1(ftratd,line)
+    processatipo1(origd,line)
     ultlinha2=''
     return ultlinha2
 
   if line[0] == '2':
     # sócios
-    ultlinha2=processatipo2(ftrats,line,ultlinha2)
+    ultlinha2=processatipo2(origs,line,ultlinha2)
     return ultlinha2
 
   if line[0] == '6':
-    processatipo6(ftratc,line)
+    processatipo6(origc,line)
     # CNAEs secundárias
     return ultlinha2
 
@@ -103,28 +105,46 @@ def tratar(ftratd,ftrats,ftratc,line,ultlinha2):
 
 def processark3200(arquivo,extensao):
   fprinc = io.open(arquivo+extensao, 'rb')
-  ftratd = io.open('det.'+extensao+'.csv','wb')
-  ftrats = io.open('soc.'+extensao+'.csv','wb')
-  ftratc = io.open('cnae.'+extensao+'.csv','w', encoding='UTF-8')
-  cabd = 'cnpj;matriz;razao_social;nome_fantasia;situacao;dt_situacao;inicio;cnae;tipologr;logradouro;numero;complemento;bairro;uf;municipio;email;capital;porte;simples;mei\n'
-  ftratd.write(cabd.encode('UTF-8','strict'))
-  cabs = 'cnpj;socio;cpfsocio;qualif;percentual;entrada;cpflegal\n'
-  ftrats.write(cabs.encode('UTF-8','strict'))
-  ftratc.write('cnpj;cnae\n')
+  colsd = ('cnpj','matriz','razao_social','nome_fantasia','situacao','dt_situacao','inicio','cnae','tipologr','logradouro','numero','complemento','bairro','uf','municipio','email','capital','porte','simples','mei')
+  colss = ('cnpj','socio','cpfsocio','qualif','percentual','entrada','cpflegal')
+  colsc = ('cnpj','cnae')
+
+  origd = FilaDeLinhas()
+  origs = FilaDeLinhas()
+  origc = FilaDeLinhas()
 
   ultlinha2 = ''
   linha = 1
   lineb = fprinc.readline()
   while lineb:
-    if linha==1:
-      linha=2
-      continue
-    else:
-      linha=linha+1
     line = lineb.decode('ISO-8859-15','ignore')
-    ultlinha2=tratar(ftratd,ftrats,ftratc,line,ultlinha2)
+    ultlinha2=tratar(origd,origs,origc,line,ultlinha2)
     lineb = fprinc.readline()
-    
+    linha=linha+1
+
+  origd.Acabou = True
+  origs.Acabou = True
+  origc.Acabou = True
+  
+  #Totais processados
+  #print(origd.Count()) 
+  #print(origs.Count()) 
+  #print(origc.Count()) 
+   
+  cond = psycopg2.connect(host='postgres-compose', dbname="postgres", user="postgres", password="postgres")
+  curd = cond.cursor()
+  curd.copy_from(origd,'detalhe',sep=';')
+  cond.commit()
+
+  cons = psycopg2.connect(host='postgres-compose', dbname="postgres", user="postgres", password="postgres")
+  curs = cons.cursor()
+  curs.copy_from(origs,'socios',sep=';')
+  cons.commit()
+
+  conc = psycopg2.connect(host='postgres-compose', dbname="postgres", user="postgres", password="postgres")
+  curc = conc.cursor()
+  curc.copy_from(origc,'cnaes',sep=';')
+  conc.commit()
 
 if len(sys.argv) != 2:
   raise ValueError('É preciso informar o arquivo a processar.')
