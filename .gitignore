@@ -1,3 +1,4 @@
 *.zip
 out.*
 python/__pycache__
+pgdata/*
