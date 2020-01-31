@@ -2,8 +2,9 @@
 
 import sys
 import io
-import psycopg2
 from FilaDeLinhas import FilaDeLinhas
+import threading
+from GravaCnpj import GravacaoPgCopy
 
 def trata(texto):
   ok = texto
@@ -103,15 +104,20 @@ def tratar(origd,origs,origc,line,ultlinha2):
 
   return ultlinha2
 
-def processark3200(arquivo,extensao):
-  fprinc = io.open(arquivo+extensao, 'rb')
-  colsd = ('cnpj','matriz','razao_social','nome_fantasia','situacao','dt_situacao','inicio','cnae','tipologr','logradouro','numero','complemento','bairro','uf','municipio','email','capital','porte','simples','mei')
-  colss = ('cnpj','socio','cpfsocio','qualif','percentual','entrada','cpflegal')
-  colsc = ('cnpj','cnae')
+def processark3200():
+  fprinc=sys.stdin.buffer
 
   origd = FilaDeLinhas()
   origs = FilaDeLinhas()
   origc = FilaDeLinhas()
+
+  outd = threading.Thread(name='detalhe',target=GravacaoPgCopy, args=(origd,'detalhe'))
+  outs = threading.Thread(name='socios',target=GravacaoPgCopy, args=(origs,'socios'))
+  outc = threading.Thread(name='cnaes',target=GravacaoPgCopy, args=(origc,'cnaes'))
+
+  outd.start()
+  outs.start()
+  outc.start()
 
   ultlinha2 = ''
   linha = 1
@@ -126,28 +132,4 @@ def processark3200(arquivo,extensao):
   origs.Acabou = True
   origc.Acabou = True
   
-  #Totais processados
-  #print(origd.Count()) 
-  #print(origs.Count()) 
-  #print(origc.Count()) 
-   
-  cond = psycopg2.connect(host='postgres-compose', dbname="postgres", user="postgres", password="postgres")
-  curd = cond.cursor()
-  curd.copy_from(origd,'detalhe',sep=';')
-  cond.commit()
-
-  cons = psycopg2.connect(host='postgres-compose', dbname="postgres", user="postgres", password="postgres")
-  curs = cons.cursor()
-  curs.copy_from(origs,'socios',sep=';')
-  cons.commit()
-
-  conc = psycopg2.connect(host='postgres-compose', dbname="postgres", user="postgres", password="postgres")
-  curc = conc.cursor()
-  curc.copy_from(origc,'cnaes',sep=';')
-  conc.commit()
-
-if len(sys.argv) != 2:
-  raise ValueError('É preciso informar o arquivo a processar.')
-arquivo = sys.argv[1]
-partes = arquivo.split('.')
-processark3200(arquivo[:-len(partes[-1])],partes[-1])
+processark3200()

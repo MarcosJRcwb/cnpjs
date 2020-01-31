@@ -47,10 +47,8 @@ DADOS_ABERTOS_CNPJ.20.zip:
 	curl http://200.152.38.155/CNPJ/DADOS_ABERTOS_CNPJ_20.zip --output DADOS_ABERTOS_CNPJ.20.zip
 
 define ziptocsv =
-	unzip -p -o $< >out.$(TMP)
-	python3 extraicnpj.py out.$(TMP) 
-	rm out.$(TMP) 
-	touch ok.$(TMP)
+	echo `sudo docker ps -aqf "name=cnpjs_python-compose"` >ok.$(TMP)
+	unzip -p -o $< | sudo docker exec -i `cat ok.$(TMP)` /bin/bash -c "cd externo && python3 extraicnpj.py"
 endef
 
 ok.01: DADOS_ABERTOS_CNPJ.01.zip
