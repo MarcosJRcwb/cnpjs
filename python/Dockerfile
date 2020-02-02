@@ -11,7 +11,7 @@ RUN mkdir /app && apt-get install -y python3-pandas python3-numpy python3-matplo
     pip3 install --upgrade pip jupyter pandarallel qgrid pyarrow pipenv_to_requirements
 RUN pip3 install metaphone fuzzywuzzy python-Levenshtein
 RUN pip3 install --upgrade pip
-RUN pip3 install psycopg2-binary
+RUN pip3 install psycopg2-binary xlsx2csv
 WORKDIR /app
 RUN apt-get install -y make gcc git
 RUN cd /app && git clone https://github.com/bkmeneguello/MTFN.git

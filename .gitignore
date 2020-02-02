@@ -3,3 +3,5 @@ out.*
 python/__pycache__
 pgdata/*
 ok.*
+*.csv
+*.xlsx

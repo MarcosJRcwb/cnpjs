@@ -17,6 +17,13 @@ def trata(texto):
     ok = ok.replace('  ',' ')
   return ok
 
+def data(ymd : str) -> str:
+  if ymd == '00000000':
+    x = ''
+  else:
+    x = ymd[:4] + '-' + ymd[4:6] + '-' + ymd[6:8]
+  return x
+
 def processatipo1(regsd : FilaDeLinhas,line):
   cnpj = line[3:17]
   matriz = line[17]
@@ -40,7 +47,7 @@ def processatipo1(regsd : FilaDeLinhas,line):
   porte = line[905:907]
   simples = line[907:909]
   mei = line[924]
-  linha = cnpj+';'+matriz+';'+razsoc.strip()+';'+fantasia.strip()+';'+situac+';'+dt_situac+';'+dt_ini+';'+cnae+';'+tipolog.strip()+';'+lograd.strip()+';'+numend.strip()+';'+comple.strip()+';'+bairro.strip()+';'+uf+';'+munic.strip()+';'+email.strip()+';'+capit+';'+porte+';'+simples+';'+mei+'\n'
+  linha = cnpj+';'+matriz+';'+razsoc.strip()+';'+fantasia.strip()+';'+situac+';'+data(dt_situac)+';'+data(dt_ini)+';'+cnae+';'+tipolog.strip()+';'+lograd.strip()+';'+numend.strip()+';'+comple.strip()+';'+bairro.strip()+';'+uf+';'+munic.strip()+';'+email.strip()+';'+capit+';'+porte+';'+simples+';'+mei+'\n'
   linha = linha.encode('UTF-8','ignore').decode('UTF-8')
   regsd.AdicionaLinha(linha)
   return
@@ -53,12 +60,12 @@ def processatipo2(regss : FilaDeLinhas,line,ultlinha2):
   perc = line[184:189]
   dt_ent = line[189:197]
   cpfleg = line[270:281]
-  linhasoc = cnpj+';'+socio.strip()+';'+cpfsoc+';'+qualif+';'+perc+';'+dt_ent+';'+cpfleg+'\n'
+  linhasoc = cnpj+';'+socio.strip()+';'+cpfsoc+';'+qualif+';'+perc+';'+data(dt_ent)+';'+cpfleg+'\n'
   if linhasoc in ultlinha2:
     return ultlinha2
+  ultlinha2 = ultlinha2 + ' ' + linhasoc
   linhasoc = linhasoc.encode('UTF-8','ignore').decode('UTF-8')
   regss.AdicionaLinha(linhasoc)
-  ultlinha2 = ultlinha2 + ' ' + linhasoc
   return ultlinha2
 
 def processatipo6(regsc : FilaDeLinhas,line):
