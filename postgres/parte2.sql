@@ -9,10 +9,10 @@ create index i2detalhe on detalhe(nome_fantasia,cnpj);
 create index i3detalhe on detalhe(situacao,cnpj);
 create index i4detalhe on detalhe(cnae,cnpj);
 
-alter table socios add constraint pksocios primary key (cnpj,socio,cpfsocio,cpflegal,data_entrada,qualif);
+alter table socios add constraint pksocios primary key (cnpj,socio,cpfsocio,cpflegal,data_entrada,qualificacao);
 
-create index i1socios on socios (socio,cnpj,cpfsocio,cpflegal,data_entrada,qualif);
-create index i2socios on socios (qualif,cnpj,socio,cpfsocio,cpflegal,data_entrada);
+create index i1socios on socios (socio,cnpj,cpfsocio,cpflegal,data_entrada,qualificacao);
+create index i2socios on socios (qualificacao,cnpj,socio,cpfsocio,cpflegal,data_entrada);
 
 alter table qualificacao add constraint pkqualificacao primary key (codigo);
 alter table situacao add constraint pksituacao primary key (codigo);
@@ -75,6 +75,6 @@ alter table cnaeibge add constraint pkcnaeibge primary key (cnae);
 alter table detalhe add constraint detalhe_cnaeibge foreign key (cnae) references cnaeibge (cnae);
 alter table cnaes add constraint cnaes_cnaeibge foreign key (cnae) references cnaeibge (cnae);
 alter table detalhe add constraint detalhe_situacao foreign key (situacao) references situacao (codigo);
-alter table socios add constraint socios_qualificacao foreign key (qualif) references qualificacao (codigo);
+alter table socios add constraint socios_qualificacao foreign key (qualificacao) references qualificacao (codigo);
 
 

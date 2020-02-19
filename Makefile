@@ -150,12 +150,12 @@ ok.fk: ok.01 ok.02 ok.03 ok.04 ok.05 ok.06 ok.07 ok.08 ok.09 ok.10 \
        ok.11 ok.12 ok.13 ok.14 ok.15 ok.16 ok.17 ok.18 ok.19 ok.20 \
        ok.00 cnae.csv
 	cat postgres/parte2.sql | sudo docker exec  --user postgres -i `cat ok.00` /bin/bash -c "cd /scripts && psql"
+	rm python/cnae.csv
 	touch ok.fk
 
 cnae.csv: cnae.xlsx ok.20
 	cp cnae.xlsx python
 	sudo docker exec -i `cat ok.20` /bin/bash -c "cd externo && xlsx2csv -c utf-8 cnae.xlsx cnae.csv"
 	tail -n +6 python/cnae.csv >postgres/cnae.csv
-	rm python/cnae.csv
 	rm python/cnae.xlsx
 	touch cnae.csv

@@ -57,10 +57,9 @@ def processatipo2(regss : FilaDeLinhas,line,ultlinha2):
   socio = trata(line[18:168])
   cpfsoc = line[168:182]
   qualif = line[182:184]
-  perc = line[184:189]
   dt_ent = line[189:197]
   cpfleg = line[270:281]
-  linhasoc = cnpj+';'+socio.strip()+';'+cpfsoc+';'+qualif+';'+perc+';'+data(dt_ent)+';'+cpfleg+'\n'
+  linhasoc = cnpj+';'+socio.strip()+';'+cpfsoc+';'+qualif+';'+data(dt_ent)+';'+cpfleg+'\n'
   if linhasoc in ultlinha2:
     return ultlinha2
   ultlinha2 = ultlinha2 + ' ' + linhasoc

@@ -1,3 +1,5 @@
+create extension if not exists fuzzystrmatch;
+
 create  table cnaes (cnpj varchar(14) not null,cnae varchar(10) not null);
 
 create  table detalhe (cnpj varchar(14) not null,
@@ -25,8 +27,7 @@ create  table socios (
 	cnpj varchar(14) not null,
 	socio varchar(150) not null,
 	cpfsocio varchar(14),
-	qualif char(2),
-	percentual varchar(8),
+	qualificacao char(2),
 	data_entrada date,
 	cpflegal varchar(14) );
 
