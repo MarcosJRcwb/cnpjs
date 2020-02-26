@@ -1,20 +1,15 @@
-alter table cnaes add constraint pkcnaes primary key (cnpj,cnae);
-create index i1cnaes on cnaes (cnae,cnpj);
+insert into situacao (codigo,descricao) values ('01','NULA');
+insert into situacao (codigo,descricao) values ('02','ATIVA');
+insert into situacao (codigo,descricao) values ('03','SUSPENSA');
+insert into situacao (codigo,descricao) values ('04','INAPTA');
+insert into situacao (codigo,descricao) values ('08','BAIXADA');
 
-update situacao set codigo='0' || codigo where cast(codigo as int)<10;
+insert into motivosituacao (codigo,descricao) values ('00','NENHUM');
 
-alter table detalhe add constraint pkdetalhe primary key (cnpj);
-create index i1detalhe on detalhe(razao_social,cnpj);
-create index i2detalhe on detalhe(nome_fantasia,cnpj);
-create index i3detalhe on detalhe(situacao,cnpj);
-create index i4detalhe on detalhe(cnae,cnpj);
-
-alter table socios add constraint pksocios primary key (cnpj,socio,cpfsocio,cpflegal,data_entrada,qualificacao);
-
-create index i1socios on socios (socio,cnpj,cpfsocio,cpflegal,data_entrada,qualificacao);
-create index i2socios on socios (qualificacao,cnpj,socio,cpfsocio,cpflegal,data_entrada);
+update motivosituacao set codigo='0' || codigo where cast(codigo as int)<10;
 
 alter table qualificacao add constraint pkqualificacao primary key (codigo);
+alter table motivosituacao add constraint pkmotivosituacao primary key (codigo);
 alter table situacao add constraint pksituacao primary key (codigo);
 
 COPY cnaeibge (cnae,divisao,grupo,classe,subclasse,descricao,dummy ) 
@@ -35,9 +30,15 @@ update cnaeibge set cnae=substring(subclasse,1,4) || substring(subclasse,6,1) ||
 alter table cnaeibge drop column subclasse;
 alter table cnaeibge alter column cnae set not null;
 
+insert into cnaeibge (cnae,descricao) values ('4713001','LOJAS DE DEPARTAMENTOS OU MAGAZINES');
+insert into cnaeibge (cnae,descricao) values ('4713003','LOJAS DUTY FREE DE AEROPORTOS INTERNACIONAIS');
+insert into cnaeibge (cnae,descricao) values ('1610201','SERRARIAS COM DESDOBRAMENTO DE MADEIRA');
+insert into cnaeibge (cnae,descricao) values ('1610202','SERRARIAS SEM DESDOBRAMENTO DE MADEIRA');
+
 insert into cnaeibge (cnae,descricao) values ('8888888','ATIVIDADE NÃO INFORMADA');
 insert into cnaeibge (cnae,descricao) values ('4721101','Padaria e confeitaria com predominância de produção própria');
 insert into cnaeibge (cnae,descricao) values ('7410201','DESIGN');
+insert into cnaeibge (cnae,descricao) values ('9609201','Clínicas de estética e similares') ON CONFLICT DO NOTHING;
 insert into cnaeibge (cnae,descricao) values ('9609203','Alojamento, higiene e embelezamento de animais');
 insert into cnaeibge (cnae,descricao) values ('3250708', 'Fabricação de artefatos de tecido não tecido para uso odonto-médico-hospitalar');
 insert into cnaeibge (cnae,descricao) values ('4541205','Comércio a varejo de peças e acessórios para motocicletas e motonetas');
@@ -59,22 +60,27 @@ insert into qualificacao (codigo,descricao) values ('29','Sócio ou acionista in
 insert into qualificacao (codigo,descricao) values ('30','Sócio acionista menor');
 insert into qualificacao (codigo,descricao) values ('37','Sócio pessoa jurídica domiciliado no exterior');
 insert into qualificacao (codigo,descricao) values ('38','Sócio pessoa física domiciliado no exterior');
+insert into qualificacao (codigo,descricao) values ('47','Sócio Pessoa Física residente no Brasil');
 insert into qualificacao (codigo,descricao) values ('52','Sócio-administrador');
 insert into qualificacao (codigo,descricao) values ('53','Sócio com capital');
+insert into qualificacao (codigo,descricao) values ('57','Sócio Comanditário Pessoa Jurídica Domiciliado no Exterior');
 insert into qualificacao (codigo,descricao) values ('63','Cotas em tesouraria');
 insert into qualificacao (codigo,descricao) values ('66','Titular Pessoa Física Residente ou Domiciliado no Exterior');
 insert into qualificacao (codigo,descricao) values ('67','Titular Pessoa Física Incapaz ou Relativamente Incapaz');
 insert into qualificacao (codigo,descricao) values ('68','Titular Pessoa Física Menor');
+insert into qualificacao (codigo,descricao) values ('69','Beneficiário Final');
+
+insert into qualificacao (codigo,descricao) values ('70','Administrador Residente ou Domiciliado no Exterior');
+insert into qualificacao (codigo,descricao) values ('71','Conselheiro de Administração Residente ou Domiciliado no Exterior');
+
 insert into qualificacao (codigo,descricao) values ('72','Diretor Residente ou Domiciliado no Exterior'); 
 insert into qualificacao (codigo,descricao) values ('73','Presidente Residente ou Domiciliado no Exterior');
+
+insert into qualificacao (codigo,descricao) values ('74','Sócio-Administrador Residente ou Domiciliado no Exterior'); 
+insert into qualificacao (codigo,descricao) values ('75','Fundador Residente ou Domiciliado no Exterior');
+
 insert into qualificacao (codigo,descricao) values ('78','Titutal pessoa jurídica domiciliada no Brasil');
 insert into qualificacao (codigo,descricao) values ('79','Titular pessoa jurídica domiciliada no exterior');
 
 alter table cnaeibge add constraint pkcnaeibge primary key (cnae);
-
-alter table detalhe add constraint detalhe_cnaeibge foreign key (cnae) references cnaeibge (cnae);
-alter table cnaes add constraint cnaes_cnaeibge foreign key (cnae) references cnaeibge (cnae);
-alter table detalhe add constraint detalhe_situacao foreign key (situacao) references situacao (codigo);
-alter table socios add constraint socios_qualificacao foreign key (qualificacao) references qualificacao (codigo);
-
 

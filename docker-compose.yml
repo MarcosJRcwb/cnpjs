@@ -20,7 +20,9 @@ services:
       - ./python:/app/externo
 
   pgadmin-compose:
-    image: dpage/pgadmin4
+    image: pgadmin-mh:1.0
+    logging:
+      driver: "none"
     environment:    
       PGADMIN_DEFAULT_EMAIL: "a@b"
       PGADMIN_DEFAULT_PASSWORD: "a"

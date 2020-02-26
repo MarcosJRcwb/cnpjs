@@ -31,6 +31,7 @@ def processatipo1(regsd : FilaDeLinhas,line):
   fantasia = trata(line[168:223])
   situac = line[223:225]
   dt_situac = line[225:233]
+  motivo = line[233:235]
   dt_ini = line[367:375]
   cnae = line[375:382]
   tipolog = line[382:402]
@@ -47,7 +48,7 @@ def processatipo1(regsd : FilaDeLinhas,line):
   porte = line[905:907]
   simples = line[907:909]
   mei = line[924]
-  linha = cnpj+';'+matriz+';'+razsoc.strip()+';'+fantasia.strip()+';'+situac+';'+data(dt_situac)+';'+data(dt_ini)+';'+cnae+';'+tipolog.strip()+';'+lograd.strip()+';'+numend.strip()+';'+comple.strip()+';'+bairro.strip()+';'+uf+';'+munic.strip()+';'+email.strip()+';'+capit+';'+porte+';'+simples+';'+mei+'\n'
+  linha = cnpj+';'+matriz+';'+razsoc.strip()+';'+fantasia.strip()+';'+situac+';'+data(dt_situac)+';'+motivo+';'+data(dt_ini)+';'+cnae+';'+tipolog.strip()+';'+lograd.strip()+';'+numend.strip()+';'+comple.strip()+';'+bairro.strip()+';'+uf+';'+munic.strip()+';'+email.strip()+';'+capit+';'+porte+';'+simples+';'+mei+'\n'
   linha = linha.encode('UTF-8','ignore').decode('UTF-8')
   regsd.AdicionaLinha(linha)
   return
