@@ -1,7 +1,19 @@
-FROM seanedwards/postgres-contrib
+FROM postgres
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update
+RUN apt-get -y install postgresql-contrib
+
+WORKDIR /usr/src/postgres
+
+VOLUME /var/lib/postgresql/data
+ENTRYPOINT ["/usr/src/postgres/docker-entrypoint.sh"]
+EXPOSE 5432
+CMD ["postgres"]
+
 RUN mkdir /externo
 RUN chmod 777 /externo
-RUN apt-get clean && apt-get update && apt-get install -y --force-yes locales
+RUN apt-get clean && apt-get update && apt-get install -y locales
 RUN locale-gen pt_BR.UTF-8
 RUN sed -i -e 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen

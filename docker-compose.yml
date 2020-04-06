@@ -2,7 +2,7 @@ version: '3'
 
 services:
   postgres-compose:
-    image: postgres:12.1
+    image: postgres-mh:1.0
     environment:
       POSTGRES_PASSWORD: "postgres"
     ports:
@@ -13,7 +13,7 @@ services:
       - ./postgres:/scripts
 
   python-compose:
-    image: python-mh
+    image: python-mh:1.0
     ports:
       - "8888:8888"
     volumes:

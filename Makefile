@@ -1,8 +1,26 @@
-all: DADOS_ABERTOS_CNPJ.01.zip DADOS_ABERTOS_CNPJ.02.zip DADOS_ABERTOS_CNPJ.03.zip DADOS_ABERTOS_CNPJ.04.zip DADOS_ABERTOS_CNPJ.05.zip \
+all:    pgadmin/ok.txt \
+        postgres/ok.txt \
+        python/ok.txt \
+        DADOS_ABERTOS_CNPJ.01.zip DADOS_ABERTOS_CNPJ.02.zip DADOS_ABERTOS_CNPJ.03.zip DADOS_ABERTOS_CNPJ.04.zip DADOS_ABERTOS_CNPJ.05.zip \
 	DADOS_ABERTOS_CNPJ.06.zip DADOS_ABERTOS_CNPJ.07.zip DADOS_ABERTOS_CNPJ.08.zip DADOS_ABERTOS_CNPJ.09.zip DADOS_ABERTOS_CNPJ.10.zip \
 	DADOS_ABERTOS_CNPJ.11.zip DADOS_ABERTOS_CNPJ.12.zip DADOS_ABERTOS_CNPJ.13.zip DADOS_ABERTOS_CNPJ.14.zip DADOS_ABERTOS_CNPJ.15.zip \
 	DADOS_ABERTOS_CNPJ.16.zip DADOS_ABERTOS_CNPJ.17.zip DADOS_ABERTOS_CNPJ.18.zip DADOS_ABERTOS_CNPJ.19.zip DADOS_ABERTOS_CNPJ.20.zip \
 	ok.fk ok.00
+
+pgadmin/ok.txt: pgadmin/config_local.py pgadmin/Dockerfile pgadmin/entrypoint.sh
+	cd pgadmin && sudo docker build . --tag pgadmin-mh:1.0
+	sudo docker inspect --type=image pgadmin-mh:1.0
+	touch pgadmin/ok.txt
+
+postgres/ok.txt: postgres/Dockerfile
+	cd postgres && sudo docker build . --tag postgres-mh:1.0
+	sudo docker inspect --type=image postgres-mh:1.0
+	touch postgres/ok.txt
+
+python/ok.txt: python/Dockerfile
+	cd python && sudo docker build . --tag python-mh:1.0
+	sudo docker inspect --type=image python-mh:1.0
+	touch python/ok.txt
 
 DADOS_ABERTOS_CNPJ.01.zip:
 	curl http://200.152.38.155/CNPJ/DADOS_ABERTOS_CNPJ_01.zip --output DADOS_ABERTOS_CNPJ.01.zip
