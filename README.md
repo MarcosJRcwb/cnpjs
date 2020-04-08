@@ -17,6 +17,8 @@ Depois siga as instruções. Use qualquer senha, de preferência uma senha muito
 
 `$ sudo make docker`
 
+`$ mkdir pgdata`
+
 `$ sudo docker-compose up`
 
 Depois que as máquinas docker estiverem iniciadas, continue em outra janela com
