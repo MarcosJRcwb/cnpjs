@@ -1,7 +1,7 @@
 *.zip
 out.*
 python/__pycache__
-pgdata/*
+pgdata
 ok.*
 *.csv
 *.xlsx

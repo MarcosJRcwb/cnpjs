@@ -1,6 +1,9 @@
+docker: pgadmin/ok.txt postgres/ok.txt python/ok.txt
+
 all:    pgadmin/ok.txt \
         postgres/ok.txt \
         python/ok.txt \
+	ok.dk \
         DADOS_ABERTOS_CNPJ.01.zip DADOS_ABERTOS_CNPJ.02.zip DADOS_ABERTOS_CNPJ.03.zip DADOS_ABERTOS_CNPJ.04.zip DADOS_ABERTOS_CNPJ.05.zip \
 	DADOS_ABERTOS_CNPJ.06.zip DADOS_ABERTOS_CNPJ.07.zip DADOS_ABERTOS_CNPJ.08.zip DADOS_ABERTOS_CNPJ.09.zip DADOS_ABERTOS_CNPJ.10.zip \
 	DADOS_ABERTOS_CNPJ.11.zip DADOS_ABERTOS_CNPJ.12.zip DADOS_ABERTOS_CNPJ.13.zip DADOS_ABERTOS_CNPJ.14.zip DADOS_ABERTOS_CNPJ.15.zip \
@@ -74,7 +77,7 @@ define ziptocsv =
 	unzip -p -o $< | sudo docker exec -i `cat ok.$(TMP)` /bin/bash -c "cd externo && python3 extraicnpj.py"
 endef
 
-ok.00: MotivoSituaoCadastral.csv QualificaoResponsavel.csv
+ok.00: MotivoSituaoCadastral.csv QualificaoResponsavel.csv ok.dk
 	iconv -f WINDOWS-1252 -t UTF-8 MotivoSituaoCadastral.csv >1.csv
 	iconv -f WINDOWS-1252 -t UTF-8 QualificaoResponsavel.csv >2.csv
 	mv 1.csv postgres/MotivoSituaoCadastral.csv
@@ -204,6 +207,18 @@ reload:
 	touch ok.csv
 
 clean:
+	if ls pgadmin/ok.* 1> /dev/null 2>&1; \
+	then \
+	  rm pgadmin/ok.* ; \
+	fi;
+	if ls python/ok.* 1> /dev/null 2>&1; \
+	then \
+	  rm python/ok.* ; \
+	fi;
+	if ls postgres/ok.* 1> /dev/null 2>&1; \
+	then \
+	  rm postgres/ok.* ; \
+	fi;
 	if ls ok.* 1> /dev/null 2>&1; \
 	then \
 	  rm ok.* ; \
