@@ -1,14 +1,13 @@
-docker: pgadmin/ok.txt postgres/ok.txt python/ok.txt
-
 all:    pgadmin/ok.txt \
         postgres/ok.txt \
         python/ok.txt \
-	ok.dk \
         DADOS_ABERTOS_CNPJ.01.zip DADOS_ABERTOS_CNPJ.02.zip DADOS_ABERTOS_CNPJ.03.zip DADOS_ABERTOS_CNPJ.04.zip DADOS_ABERTOS_CNPJ.05.zip \
 	DADOS_ABERTOS_CNPJ.06.zip DADOS_ABERTOS_CNPJ.07.zip DADOS_ABERTOS_CNPJ.08.zip DADOS_ABERTOS_CNPJ.09.zip DADOS_ABERTOS_CNPJ.10.zip \
 	DADOS_ABERTOS_CNPJ.11.zip DADOS_ABERTOS_CNPJ.12.zip DADOS_ABERTOS_CNPJ.13.zip DADOS_ABERTOS_CNPJ.14.zip DADOS_ABERTOS_CNPJ.15.zip \
 	DADOS_ABERTOS_CNPJ.16.zip DADOS_ABERTOS_CNPJ.17.zip DADOS_ABERTOS_CNPJ.18.zip DADOS_ABERTOS_CNPJ.19.zip DADOS_ABERTOS_CNPJ.20.zip \
 	ok.fk ok.00
+
+docker: pgadmin/ok.txt postgres/ok.txt python/ok.txt
 
 pgadmin/ok.txt: pgadmin/config_local.py pgadmin/Dockerfile pgadmin/entrypoint.sh
 	cd pgadmin && sudo docker build . --tag pgadmin-mh:1.0
@@ -77,15 +76,16 @@ define ziptocsv =
 	unzip -p -o $< | sudo docker exec -i `cat ok.$(TMP)` /bin/bash -c "cd externo && python3 extraicnpj.py"
 endef
 
-ok.00: MotivoSituaoCadastral.csv QualificaoResponsavel.csv ok.dk
+ok.00: MotivoSituaoCadastral.csv QualificaoResponsavel.csv
 	iconv -f WINDOWS-1252 -t UTF-8 MotivoSituaoCadastral.csv >1.csv
 	iconv -f WINDOWS-1252 -t UTF-8 QualificaoResponsavel.csv >2.csv
 	mv 1.csv postgres/MotivoSituaoCadastral.csv
 	mv 2.csv postgres/QualificaoResponsavel.csv
-	echo `sudo docker ps -aqf "name=cnpjs_postgres-compose"` >ok.00
-	cat postgres/parte0.sql | sudo docker exec  --user postgres -i `cat ok.00` /bin/bash -c "cd /scripts && psql"
+	echo `sudo docker ps -aqf "name=cnpjs_postgres-compose"` >ok.000
+	cat postgres/parte0.sql | sudo docker exec  --user postgres -i `cat ok.000` /bin/bash -c "cd /scripts && psql"
 	rm postgres/MotivoSituaoCadastral.csv
 	rm postgres/QualificaoResponsavel.csv
+	mv ok.000 ok.00
 
 ok.0a: ok.00
 	echo `sudo docker ps -aqf "name=cnpjs_postgres-compose"` >ok.00
