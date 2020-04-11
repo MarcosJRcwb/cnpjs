@@ -4,9 +4,11 @@ insert into situacao (codigo,descricao) values ('03','SUSPENSA');
 insert into situacao (codigo,descricao) values ('04','INAPTA');
 insert into situacao (codigo,descricao) values ('08','BAIXADA');
 
-insert into motivosituacao (codigo,descricao) values ('00','NENHUM');
+update motivosituacao
+set codigo=concat('0', codigo) 
+where cast(codigo as int) < 10 and cast(codigo as int) > 0;
 
-update motivosituacao set codigo='0' || codigo where cast(codigo as int)<10;
+insert into motivosituacao (codigo,descricao) values ('00','NENHUM');
 
 alter table qualificacao add constraint pkqualificacao primary key (codigo);
 alter table motivosituacao add constraint pkmotivosituacao primary key (codigo);

@@ -5,6 +5,7 @@ all:    pgadmin/ok.txt \
 	DADOS_ABERTOS_CNPJ.06.zip DADOS_ABERTOS_CNPJ.07.zip DADOS_ABERTOS_CNPJ.08.zip DADOS_ABERTOS_CNPJ.09.zip DADOS_ABERTOS_CNPJ.10.zip \
 	DADOS_ABERTOS_CNPJ.11.zip DADOS_ABERTOS_CNPJ.12.zip DADOS_ABERTOS_CNPJ.13.zip DADOS_ABERTOS_CNPJ.14.zip DADOS_ABERTOS_CNPJ.15.zip \
 	DADOS_ABERTOS_CNPJ.16.zip DADOS_ABERTOS_CNPJ.17.zip DADOS_ABERTOS_CNPJ.18.zip DADOS_ABERTOS_CNPJ.19.zip DADOS_ABERTOS_CNPJ.20.zip \
+	cnae.csv \
 	ok.fk ok.00
 
 docker: pgadmin/ok.txt postgres/ok.txt python/ok.txt
@@ -173,24 +174,23 @@ ok.20: DADOS_ABERTOS_CNPJ.20.zip ok.0a
 	$(ziptocsv)
 
 cnae.csv: cnae.xlsx ok.00
-	echo `sudo docker ps -aqf "name=cnpjs_postgres-compose"` >ok.00
-	echo `sudo docker ps -aqf "name=cnpjs_python-compose"` >ok.20
+	echo `sudo docker ps -aqf "name=cnpjs_postgres-compose"` >ok.0b
+	echo `sudo docker ps -aqf "name=cnpjs_python-compose"` >ok.0c
 	cp cnae.xlsx python
-	sudo docker exec -i `cat ok.20` /bin/bash -c "cd externo && xlsx2csv -c utf-8 cnae.xlsx cnae.csv"
+	sudo docker exec -i `cat ok.0c` /bin/bash -c "cd externo && xlsx2csv -c utf-8 cnae.xlsx cnae.csv"
 	tail -n +6 python/cnae.csv >postgres/cnae.csv
 	rm python/cnae.xlsx
 	touch cnae.csv
 
-ok.csv: ok.00 cnae.csv
-	cat postgres/parte2.sql | sudo docker exec  --user postgres -i `cat ok.00` /bin/bash -c "cd /scripts && psql"
+ok.csv: ok.0b cnae.csv
+	cat postgres/parte2.sql | sudo docker exec  --user postgres -i `cat ok.0b` /bin/bash -c "cd /scripts && psql"
 	rm python/cnae.csv
 	touch ok.csv
 
 ok.fk: ok.01 ok.02 ok.03 ok.04 ok.05 ok.06 ok.07 ok.08 ok.09 ok.10 \
        ok.11 ok.12 ok.13 ok.14 ok.15 ok.16 ok.17 ok.18 ok.19 ok.20 \
-       ok.00 ok.csv ok.0a
+       ok.0b ok.csv ok.0a
 	cat postgres/parte3.sql | sudo docker exec  --user postgres -i `cat ok.00` /bin/bash -c "cd /scripts && psql"
-	rm python/cnae.csv
 	touch ok.fk
 
 reload:
@@ -203,6 +203,9 @@ reload:
 	  rm ok.* ; \
 	fi;
 	touch ok.00
+	touch ok.0c
+	touch ok.0b
+	touch ok.fk
 	touch cnae.csv
 	touch ok.csv
 
